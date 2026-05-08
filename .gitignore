@@ -1,0 +1,96 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+frontend/dist/
+backend/.pytest_cache/
+.pytest_cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Environment files - NEVER commit real credentials
+.env
+.env.*
+!.env*.example
+
+# Database
+*.db
+*.sqlite3
+
+# Logs
+logs/
+*.log
+
+# Data files (keep structure but ignore contents)
+data/genomes/*
+data/blast_db/*
+data/exports/*
+data/uploads/*
+!data/genomes/.gitkeep
+!data/blast_db/.gitkeep
+!data/exports/.gitkeep
+!data/uploads/.gitkeep
+backend/data/
+
+# Docker artifacts - never commit these
+docker/*.tar.gz
+docker/*.tar
+docker/*.sql
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+
+# TypeScript
+*.tsbuildinfo
+
+# Temporary files
+*.tmp
+*.bak
+
+# Claude
+.claude/
