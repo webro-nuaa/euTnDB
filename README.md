@@ -57,8 +57,6 @@ euTnDB/
 
 ## Quick Start
 
-### Docker (recommended)
-
 ```bash
 cd docker
 cp .env.docker.example .env.docker
@@ -68,29 +66,12 @@ cp .env.docker.example .env.docker
 
 The site will be available at `http://localhost`.
 
-### Manual Development
-
-**Backend:**
+For frontend development with hot-reload:
 
 ```bash
-cd backend
-python -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-# Edit .env with your database/redis settings
-alembic upgrade head
-uvicorn app.main:app --reload --port 8000
+docker compose -f docker/docker-compose.yml up -d   # backend + db + redis
+cd frontend && npm install && npm run dev            # dev server on :3000
 ```
-
-**Frontend:**
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-The dev server runs at `http://localhost:3000`.
 
 ## API Endpoints
 
