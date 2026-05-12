@@ -43,4 +43,4 @@ done
 echo ""
 echo "=== Deploy Complete ==="
 echo "Site:       http://localhost"
-echo "API Docs:   http://localhost:${BACKEND_PORT:-8000}/docs"
+echo "API Docs:   http://localhost/docs"

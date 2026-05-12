@@ -47,11 +47,11 @@ cp .env.docker.example .env.docker
 ./deploy.sh
 ```
 
-The site is available at `http://localhost`, API docs at `http://localhost:8000/docs`.
+The site is available at `http://localhost`, API docs at `http://localhost/docs`.
 
 ## API
 
-Full interactive docs at `http://localhost:8000/docs` after deployment.
+Full interactive docs at `http://localhost/docs` after deployment.
 
 | Prefix | Description |
 |---|---|
