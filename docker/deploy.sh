@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e
 
+# Check Docker access
+if ! docker info > /dev/null 2>&1; then
+    echo "Error: Cannot connect to Docker."
+    echo "  sudo usermod -aG docker $USER"
+    echo "  newgrp docker  (or log out and back in)"
+    exit 1
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
