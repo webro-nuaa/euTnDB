@@ -8,7 +8,7 @@ from app.core.config import settings
 
 
 def utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 logger = logging.getLogger("tndb")
 
