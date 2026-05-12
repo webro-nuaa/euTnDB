@@ -26,7 +26,7 @@ A web platform for browsing, searching, classifying, and analyzing eukaryotic tr
 | Build | Vite |
 | Containerization | Docker Compose (6 services: frontend, backend, worker, db, redis, backup) |
 | CI | GitHub Actions |
-| Testing | pytest (backend, 161 tests) + vitest (frontend, 10 tests) |
+| Testing | pytest (backend, 172 tests) + vitest (frontend, 10 tests) |
 
 ## Project Structure
 
@@ -41,7 +41,7 @@ euTnDB/
 │   │   ├── tasks/           # Celery async workers (BLAST, MineTn)
 │   │   └── main.py          # FastAPI application entry point
 │   ├── migrations/          # Alembic database migrations
-│   └── tests/               # Backend test suite (17 files, 161 tests)
+│   └── tests/               # Backend test suite (18 files, 172 tests)
 ├── frontend/
 │   ├── src/
 │   │   ├── api/             # Axios API client modules
@@ -119,7 +119,7 @@ Interactive API docs: `http://localhost:8000/docs`
 ## Testing
 
 ```bash
-# Backend (161 tests)
+# Backend (172 tests)
 cd backend
 pytest tests/ -v
 
