@@ -139,3 +139,23 @@ async def tn_entry(async_session: AsyncSession, admin_user):
     await async_session.commit()
     await async_session.refresh(entry)
     return entry
+
+
+@pytest.fixture
+async def approved_entry(async_session: AsyncSession, admin_user):
+    from app.models import TnEntry
+    entry = TnEntry(
+        name="TEST-APPROVED",
+        family="hAT",
+        tn_group="hAT-Group",
+        origin="Homo sapiens",
+        mge_type="TE",
+        length=2000,
+        dna_sequence="GCTA" * 500,
+        status="approved",
+        submitted_by=admin_user.id,
+    )
+    async_session.add(entry)
+    await async_session.commit()
+    await async_session.refresh(entry)
+    return entry

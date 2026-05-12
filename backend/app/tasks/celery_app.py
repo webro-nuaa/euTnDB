@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.config import settings
 
-broker_url = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/1")
+broker_url = settings.CELERY_BROKER_URL
 
 celery_app = Celery(
     "tndb",

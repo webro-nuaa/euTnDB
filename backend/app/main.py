@@ -15,12 +15,13 @@ logger = logging.getLogger("tndb")
 async def lifespan(app: FastAPI):
     from app.core.logging import setup_logging
     setup_logging()
-    from app.core.database import init_db
+    from app.core.database import init_db, engine
     await init_db()
     await _ensure_default_admin()
     yield
     from app.core.redis import close_redis
     await close_redis()
+    await engine.dispose()
 
 
 app = FastAPI(

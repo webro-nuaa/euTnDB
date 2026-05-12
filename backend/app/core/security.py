@@ -15,15 +15,15 @@ def get_password_hash(password: str) -> str:
 
 def create_access_token(username: str, expires_delta: timedelta | None = None) -> str:
     if expires_delta is None:
-        expires_delta = timedelta(hours=24)
+        expires_delta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     expire = datetime.now(timezone.utc) + expires_delta
     payload = {"sub": username, "exp": expire}
-    return jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 
 def decode_access_token(token: str) -> dict | None:
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         return payload
     except jwt.JWTError:
         return None

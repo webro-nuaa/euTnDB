@@ -5,6 +5,21 @@ COMPOSE_FILES="-f docker-compose.yml -f docker-compose.prod.yml"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
+# Load .env.docker if present
+if [ -f .env.docker ]; then
+    set -a
+    source .env.docker
+    set +a
+fi
+
+# Map USE_CHINA_MIRROR to concrete mirror URLs
+if [ "${USE_CHINA_MIRROR:-false}" = "true" ]; then
+    export APT_MIRROR="mirrors.tuna.tsinghua.edu.cn"
+    export PIP_INDEX_URL="https://pypi.tuna.tsinghua.edu.cn/simple"
+    export NPM_REGISTRY="https://registry.npmmirror.com"
+    echo ">>> Using China mirrors for faster builds"
+fi
+
 echo "=== euTnDB Docker Deploy ==="
 
 echo "[1/4] Building images..."

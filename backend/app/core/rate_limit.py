@@ -6,6 +6,10 @@ from app.core.redis import get_redis
 _RATE_LIMITS = {
     "/api/v1/auth/login": (5, 60),
     "/api/v1/auth/register": (3, 3600),
+    "/api/v1/blast": (10, 60),
+    "/api/v1/analyze/sequence": (20, 60),
+    "/api/v1/tn": (30, 60),
+    "/api/v1/minetn/upload": (10, 60),
 }
 
 

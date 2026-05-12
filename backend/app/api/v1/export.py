@@ -26,12 +26,12 @@ async def export_fasta(
     db: AsyncSession = Depends(get_db)
 ):
     result = await db.execute(
-        select(TnEntry).where(TnEntry.name == tn_id)
+        select(TnEntry).where(TnEntry.name == tn_id, TnEntry.status == "approved")
     )
     entry = result.scalar_one_or_none()
 
     if not entry:
-        raise HTTPException(status_code=404, detail="Tn entry not found")
+        raise HTTPException(status_code=404, detail="Entry not found or not yet approved")
 
     seq = entry.dna_sequence or ""
     fasta_content = f">{entry.name} {entry.family} transposon from {entry.origin or 'unknown'}\n"
@@ -51,12 +51,12 @@ async def export_embl(
     db: AsyncSession = Depends(get_db)
 ):
     result = await db.execute(
-        select(TnEntry).where(TnEntry.name == tn_id)
+        select(TnEntry).where(TnEntry.name == tn_id, TnEntry.status == "approved")
     )
     entry = result.scalar_one_or_none()
 
     if not entry:
-        raise HTTPException(status_code=404, detail="Tn entry not found")
+        raise HTTPException(status_code=404, detail="Entry not found or not yet approved")
 
     embl_content = generate_embl(entry)
 

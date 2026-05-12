@@ -1,14 +1,44 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, or_
 from typing import Optional
 
 from app.core.database import get_db
+from app.core.security import decode_access_token
 from app.models import TnEntry, User
 from app.schemas import TnEntryCreate, TnEntryUpdate, TnEntryResponse, TnListResponse, ApiResponse
-from app.api.v1.auth import get_current_user
+from app.api.v1.auth import get_current_user, COOKIE_NAME
 
 router = APIRouter(prefix="/tn", tags=["Tn Data"])
+
+
+async def get_optional_user(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+) -> User | None:
+    token = request.cookies.get(COOKIE_NAME)
+    if not token:
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            token = auth_header[7:]
+    if not token:
+        return None
+
+    payload = decode_access_token(token)
+    if payload is None:
+        return None
+
+    username = payload.get("sub")
+    if username is None:
+        return None
+
+    result = await db.execute(select(User).where(User.username == username))
+    user = result.scalar_one_or_none()
+
+    if user is None or not user.is_active:
+        return None
+
+    return user
 
 
 @router.get("", response_model=ApiResponse[TnListResponse])
@@ -87,12 +117,15 @@ async def get_tn_detail(tn_id: str, db: AsyncSession = Depends(get_db)):
 async def create_tn(
     tn_data: TnEntryCreate,
     db: AsyncSession = Depends(get_db),
+    current_user: User | None = Depends(get_optional_user),
 ):
     result = await db.execute(select(TnEntry).where(TnEntry.name == tn_data.name))
     if result.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Name already exists")
 
     entry = TnEntry(**tn_data.model_dump())
+    if current_user:
+        entry.submitted_by = current_user.id
 
     db.add(entry)
     await db.commit()

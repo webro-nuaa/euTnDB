@@ -1,3 +1,4 @@
+import html
 import logging
 import smtplib
 import ssl
@@ -71,9 +72,9 @@ def send_download_approved_email(
         <h2 style="margin: 0;">euTnDB - Download Request Approved</h2>
       </div>
       <div style="padding: 20px; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 8px 8px;">
-        <p>Dear {requester_name or 'Researcher'},</p>
+        <p>Dear {html.escape(requester_name or 'Researcher')},</p>
         <p>Your download request has been <strong style="color: #34a853;">approved</strong> by the euTnDB administrator.</p>
-        <p><strong>Requested Data:</strong> {data_description}</p>
+        <p><strong>Requested Data:</strong> {html.escape(data_description)}</p>
         <p>The data file is attached to this email. You can also visit <a href="https://tndb.org">euTnDB</a> for more information.</p>
         <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;">
         <p style="color: #80868b; font-size: 12px;">This is an automated email from euTnDB. Please do not reply directly.</p>
@@ -96,12 +97,12 @@ def send_download_rejected_email(
         <h2 style="margin: 0;">euTnDB - Download Request Rejected</h2>
       </div>
       <div style="padding: 20px; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 8px 8px;">
-        <p>Dear {requester_name or 'Researcher'},</p>
+        <p>Dear {html.escape(requester_name or 'Researcher')},</p>
         <p>We regret to inform you that your download request has been <strong style="color: #ea4335;">rejected</strong>.</p>
-        <p><strong>Requested Data:</strong> {data_description}</p>
+        <p><strong>Requested Data:</strong> {html.escape(data_description)}</p>
         <p><strong>Reason:</strong></p>
         <div style="background: #fce8e6; padding: 12px; border-radius: 6px; border-left: 3px solid #ea4335;">
-          {reason}
+          {html.escape(reason)}
         </div>
         <p>If you have questions, please contact the euTnDB team.</p>
         <hr style="border: none; border-top: 1px solid #e0e0e0; margin: 20px 0;">

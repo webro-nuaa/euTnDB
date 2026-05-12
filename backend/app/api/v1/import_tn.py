@@ -6,6 +6,7 @@ from typing import Optional
 import io
 
 from app.core.database import get_db
+from app.core.config import settings as app_settings
 from app.models import TnEntry, User
 from app.schemas.common import ApiResponse
 from app.api.v1.auth import get_current_user
@@ -183,6 +184,8 @@ async def import_excel(
     import openpyxl
 
     content = await file.read()
+    if len(content) > app_settings.MAX_UPLOAD_SIZE:
+        raise HTTPException(status_code=400, detail="File too large")
     try:
         wb = openpyxl.load_workbook(io.BytesIO(content), read_only=True, data_only=True)
     except Exception as e:

@@ -3,6 +3,8 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.frontend
+      args:
+        NPM_REGISTRY: ${NPM_REGISTRY:-}
     ports:
       - "80:80"
     depends_on:
@@ -15,6 +17,9 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.backend
+      args:
+        APT_MIRROR: ${APT_MIRROR:-}
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-}
     expose:
       - "8000"
     env_file:
@@ -98,10 +103,9 @@ services:
     command:
       - |
         while true; do
-          sleep $$((3600 * 6))
-          PGPASSWORD=$${POSTGRES_PASSWORD} pg_dump -h db -U $${POSTGRES_USER} $${POSTGRES_DB} \
-            | gzip > /backups/tndb_$$(date +%Y%m%d_%H%M%S).sql.gz
-          # Keep last 14 backups
+          sleep $((3600 * 6))
+          PGPASSWORD=${POSTGRES_PASSWORD} pg_dump -h db -U ${POSTGRES_USER} ${POSTGRES_DB} \
+            | gzip > /backups/tndb_$(date +%Y%m%d_%H%M%S).sql.gz
           ls -1t /backups/*.gz | tail -n +15 | xargs rm -f 2>/dev/null || true
         done
     environment:

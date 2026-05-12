@@ -1,10 +1,11 @@
 import json
 import os
 import uuid
+from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func
 
 from app.core.database import get_db, utcnow
 from app.core.config import settings
@@ -26,12 +27,18 @@ async def upload_genome(
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Permission denied")
 
-    if not file.filename.endswith(('.fa', '.fasta', '.fna')):
+    if not file.filename or not file.filename.endswith(('.fa', '.fasta', '.fna')):
         raise HTTPException(status_code=400, detail="FASTA format required")
 
+    safe_name = Path(file.filename).name
+    if safe_name != file.filename:
+        raise HTTPException(status_code=400, detail="Invalid filename")
+
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
-    file_path = os.path.join(settings.UPLOAD_DIR, f"{uuid.uuid4().hex[:8]}_{file.filename}")
+    file_path = os.path.join(settings.UPLOAD_DIR, f"{uuid.uuid4().hex[:8]}_{safe_name}")
     content = await file.read()
+    if len(content) > settings.MAX_UPLOAD_SIZE:
+        raise HTTPException(status_code=400, detail="File too large")
     with open(file_path, "wb") as f:
         f.write(content)
 
@@ -72,18 +79,24 @@ async def create_minetn_task(
 
 @router.get("", response_model=ApiResponse)
 async def get_minetn_task_list(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Permission denied")
 
-    result = await db.execute(
-        select(MineTnTask).order_by(MineTnTask.created_at.desc())
-    )
+    query = select(MineTnTask).order_by(MineTnTask.created_at.desc())
+
+    count_query = select(func.count()).select_from(query.subquery())
+    total = (await db.execute(count_query)).scalar() or 0
+
+    query = query.offset((page - 1) * page_size).limit(page_size)
+    result = await db.execute(query)
     tasks = result.scalars().all()
     items = [MineTnTaskResponse.model_validate(t).model_dump() for t in tasks]
-    return ApiResponse(data=items)
+    return ApiResponse(data={"items": items, "total": total, "page": page, "page_size": page_size})
 
 
 @router.get("/{task_id}", response_model=ApiResponse)

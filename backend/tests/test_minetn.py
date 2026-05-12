@@ -74,7 +74,8 @@ class TestMineTnTaskList:
         })
         assert resp.status_code == 200
         data = resp.json()
-        assert isinstance(data["data"], list)
+        assert "items" in data["data"]
+        assert isinstance(data["data"]["items"], list)
 
     @pytest.mark.asyncio
     async def test_list_tasks_unauthorized(self, client: AsyncClient):

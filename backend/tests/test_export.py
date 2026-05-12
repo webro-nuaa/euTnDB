@@ -5,12 +5,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 class TestExportFasta:
     @pytest.mark.asyncio
-    async def test_export_fasta_found(self, client: AsyncClient, tn_entry):
-        resp = await client.get(f"/api/v1/export/fasta/{tn_entry.name}")
+    async def test_export_fasta_found(self, client: AsyncClient, approved_entry):
+        resp = await client.get(f"/api/v1/export/fasta/{approved_entry.name}")
         assert resp.status_code == 200
         content = resp.text
         assert content.startswith(">")
-        assert "TEST-TE-1" in content
+        assert "TEST-APPROVED" in content
 
     @pytest.mark.asyncio
     async def test_export_fasta_not_found(self, client: AsyncClient):
@@ -20,11 +20,11 @@ class TestExportFasta:
 
 class TestExportEmbl:
     @pytest.mark.asyncio
-    async def test_export_embl_found(self, client: AsyncClient, tn_entry):
-        resp = await client.get(f"/api/v1/export/embl/{tn_entry.name}")
+    async def test_export_embl_found(self, client: AsyncClient, approved_entry):
+        resp = await client.get(f"/api/v1/export/embl/{approved_entry.name}")
         assert resp.status_code == 200
         content = resp.text
-        assert "ID   TEST-TE-1" in content
+        assert "ID   TEST-APPROVED" in content
         assert "//" in content
 
     @pytest.mark.asyncio
