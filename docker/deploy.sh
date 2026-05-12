@@ -4,14 +4,17 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
-# Load environment
-if [ -f .env.docker ]; then
-    set -a
-    source .env.docker
-    set +a
+if [ ! -f .env.docker ]; then
+    echo "Error: .env.docker not found"
+    echo "  cp .env.docker.example .env.docker"
+    echo "  edit .env.docker — set ADMIN_PASSWORD and SECRET_KEY"
+    exit 1
 fi
 
-# China mirror support
+set -a
+source .env.docker
+set +a
+
 if [ "${USE_CHINA_MIRROR:-false}" = "true" ]; then
     export APT_MIRROR="mirrors.tuna.tsinghua.edu.cn"
     export PIP_INDEX_URL="https://pypi.tuna.tsinghua.edu.cn/simple"
@@ -29,11 +32,11 @@ docker compose up -d
 
 echo "[3/3] Waiting for backend..."
 for i in $(seq 1 30); do
-    if curl -sf http://localhost:${BACKEND_PORT:-8000}/health > /dev/null 2>&1; then
+    if docker compose exec -T backend curl -sf http://localhost:8000/health > /dev/null 2>&1; then
         echo "Backend ready"
         break
     fi
-    [ "$i" -eq 30 ] && echo "Warning: Backend not ready after 60s"
+    [ "$i" -eq 30 ] && echo "Warning: Backend not ready after 60s, check logs: docker compose logs backend"
     sleep 2
 done
 
@@ -41,4 +44,3 @@ echo ""
 echo "=== Deploy Complete ==="
 echo "Site:       http://localhost"
 echo "API Docs:   http://localhost:${BACKEND_PORT:-8000}/docs"
-echo "Admin:      check .env.docker"

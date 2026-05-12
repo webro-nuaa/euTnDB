@@ -32,27 +32,10 @@ A web platform for browsing, searching, classifying, and analyzing eukaryotic tr
 
 ```
 euTnDB/
-├── backend/
-│   ├── app/
-│   │   ├── api/v1/          # REST API routers (16 endpoints)
-│   │   ├── core/            # Config, database, security, rate limiting
-│   │   ├── models/          # SQLAlchemy ORM models (8 tables)
-│   │   ├── schemas/         # Pydantic request/response schemas
-│   │   ├── tasks/           # Celery async workers (BLAST, MineTn)
-│   │   └── main.py          # FastAPI application entry point
-│   ├── migrations/          # Alembic database migrations
-│   └── tests/               # Backend test suite (18 files, 172 tests)
-├── frontend/
-│   ├── src/
-│   │   ├── api/             # Axios API client modules
-│   │   ├── router/          # Vue Router routes
-│   │   ├── stores/          # Pinia state management
-│   │   ├── types/           # TypeScript type definitions
-│   │   └── views/           # Vue components (public + admin)
-│   └── package.json
-├── docker/                  # Docker Compose deployment configs
-├── .github/workflows/       # CI pipeline
-└── README.md
+├── backend/app/             # FastAPI (api, core, models, schemas, tasks)
+├── frontend/src/            # Vue 3 + TypeScript + Element Plus
+├── docker/                  # Docker deployment (compose, nginx, Dockerfiles)
+└── .github/workflows/       # CI pipeline
 ```
 
 ## Quick Start
@@ -64,57 +47,24 @@ cp .env.docker.example .env.docker
 ./deploy.sh
 ```
 
-The site will be available at `http://localhost`.
+The site is available at `http://localhost`, API docs at `http://localhost:8000/docs`.
 
-For frontend development with hot-reload:
+## API
 
-```bash
-docker compose -f docker/docker-compose.yml up -d   # backend + db + redis
-cd frontend && npm install && npm run dev            # dev server on :3000
-```
-
-## API Endpoints
+Full interactive docs at `http://localhost:8000/docs` after deployment.
 
 | Prefix | Description |
 |---|---|
-| `GET /health` | Health check |
-| `POST /api/v1/auth/login` | Login (returns Bearer token + httpOnly cookie) |
-| `POST /api/v1/auth/logout` | Logout (clears cookie) |
-| `GET /api/v1/auth/me` | Current user info |
-| `POST /api/v1/auth/change-password` | Change password (authed) |
-| `GET /api/v1/tn` | List TE entries (paginated, filterable) |
-| `GET /api/v1/tn/{name}` | TE entry detail |
-| `POST /api/v1/tn` | Submit new TE entry |
-| `PUT /api/v1/tn/{name}` | Update TE entry (admin) |
-| `DELETE /api/v1/tn/{name}` | Delete TE entry (admin) |
-| `GET /api/v1/search` | Full-text search |
-| `GET /api/v1/classification` | Classification tree |
-| `GET /api/v1/stats` | Public statistics |
-| `POST /api/v1/analyze` | Sequence analysis |
-| `GET /api/v1/export/{name}` | Export single entry (FASTA/EMBL/JSON) |
-| `POST /api/v1/export/batch` | Batch export |
-| `GET /api/v1/import/template` | Download Excel template (admin) |
-| `POST /api/v1/import/excel` | Upload Excel import (admin) |
-| `POST /api/v1/blast` | Submit BLAST job |
-| `GET /api/v1/blast/{job_id}` | Get BLAST job status/results |
-| `POST /api/v1/minetn` | Submit MineTn job |
-| `GET /api/v1/minetn/{task_id}` | Get MineTn task status/results |
-| `GET /api/v1/review/pending` | List pending review entries (admin) |
-| `POST /api/v1/review/{name}` | Approve/reject entry (admin) |
-| `GET /api/v1/review/history` | Review history (admin) |
-| `POST /api/v1/download-request` | Submit download request |
-| `GET /api/v1/download-request/pending` | Pending download requests (admin) |
-| `GET /api/v1/download-request/history` | Download request history (admin) |
-| `POST /api/v1/download-request/{id}/review` | Approve/reject download request (admin) |
-| `GET /api/v1/admin/stats` | Admin dashboard stats |
-| `GET /api/v1/admin/users` | List users (admin) |
-| `POST /api/v1/admin/users` | Create user (admin) |
-| `PUT /api/v1/admin/users/{id}` | Update user (admin) |
-| `DELETE /api/v1/admin/users/{id}` | Delete user (admin) |
-| `GET /api/v1/admin/settings` | System settings (admin) |
-| `PUT /api/v1/admin/settings` | Update settings (admin) |
-
-Interactive API docs: `http://localhost:8000/docs`
+| `/auth` | Login, logout, user info, password change |
+| `/tn` | CRUD for TE entries, public browse & search |
+| `/blast` | BLAST search jobs |
+| `/minetn` | De novo TE mining jobs |
+| `/review` | Admin review queue |
+| `/export` | FASTA / EMBL export |
+| `/download-request` | Moderated data access with email |
+| `/import` | Excel bulk import |
+| `/analyze` | Sequence analysis (TIR, TSD, ORF prediction) |
+| `/admin/users`, `/admin/settings` | Admin dashboard |
 
 ## Testing
 
